@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Supply Ledger Card (COA Appendix 57)</title>
+<style>
+  :root {
+    --paper: #ffffff;
+    --desk: #e9ecef;
+    --ink: #1a1a1a;
+    --rule: #333333;
+    --soft: #f1f3f5;
+    --accent: #1d4e89;
+    --warn: #b42318;
+    --warn-bg: #fdecea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #1e2124;
+      --desk: #121416;
+      --ink: #e8eaed;
+      --rule: #8a9099;
+      --soft: #2a2e33;
+      --accent: #7fb0e8;
+      --warn: #ff8a80;
+      --warn-bg: #3a2020;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--desk);
+    color: var(--ink);
+    font: 14px/1.4 Arial, Helvetica, sans-serif;
+    padding: 16px;
+  }
+  .toolbar {
+    max-width: 1100px; margin: 0 auto 12px;
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  }
+  .toolbar .spacer { flex: 1; }
+  button {
+    font: inherit; padding: 7px 12px; border: 1px solid var(--rule);
+    background: var(--paper); color: var(--ink); border-radius: 4px; cursor: pointer;
+  }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  @media (prefers-color-scheme: dark) { button.primary { color: #0b1b2e; } }
+  button:hover { filter: brightness(0.96); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  #status { font-size: 12px; opacity: 0.75; }
+
+  .sheet {
+    max-width: 1100px; margin: 0 auto; background: var(--paper);
+    border: 1px solid var(--rule); padding: 20px 22px 26px;
+  }
+  .appendix { text-align: right; font-style: italic; font-size: 12px; }
+  h1 { text-align: center; font-size: 20px; letter-spacing: 0.04em; margin: 4px 0 16px; }
+
+  .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 28px; margin-bottom: 14px; }
+  .meta label { display: flex; align-items: flex-end; gap: 8px; font-weight: bold; }
+  .meta label span { white-space: nowrap; }
+  .meta input {
+    flex: 1; min-width: 0; font: inherit; font-weight: normal; color: var(--ink);
+    background: transparent; border: 0; border-bottom: 1px solid var(--rule); padding: 3px 2px;
+  }
+
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 980px; table-layout: fixed; }
+  th, td { border: 1px solid var(--rule); padding: 0; }
+  th { background: var(--soft); text-align: center; padding: 5px 4px; font-size: 13px; }
+  td input {
+    width: 100%; border: 0; background: transparent; color: var(--ink);
+    font: inherit; padding: 6px 5px; text-align: right;
+  }
+  td input.txt, td input[type="date"] { text-align: left; }
+  td.calc { text-align: right; padding: 6px 5px; font-variant-numeric: tabular-nums; background: var(--soft); }
+  td.act { width: 34px; text-align: center; border: 0; background: transparent; }
+  td.act button { padding: 0 7px; line-height: 22px; border-radius: 3px; }
+  tr.over td { background: var(--warn-bg); }
+  tr.over td.calc { color: var(--warn); font-weight: bold; }
+  .msg { color: var(--warn); font-size: 12.5px; min-height: 18px; margin-top: 8px; }
+  .help { margin-top: 12px; font-size: 12px; opacity: 0.8; max-width: 90ch; }
+
+  @media (max-width: 720px) { .meta { grid-template-columns: 1fr; } }
+
+  @media print {
+    @page { size: A4 landscape; margin: 10mm; }
+    body { background: #fff; color: #000; padding: 0; }
+    .toolbar, .help, .msg, td.act, th.act { display: none !important; }
+    .sheet { border: 0; padding: 0; max-width: none; background: #fff; color: #000; }
+    td.calc, th { background: #fff !important; color: #000 !important; }
+    td input, .meta input { color: #000; }
+    tr.over td { background: #fff; }
+    table { min-width: 0; }
+    .scroll { overflow: visible; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button class="primary" id="addRow">Add row</button>
+  <button id="addFive">Add 5 rows</button>
+  <button id="csv">Export CSV</button>
+  <button id="print">Print</button>
+  <span class="spacer"></span>
+  <span id="status" role="status"></span>
+  <button id="reset">Clear card</button>
+</div>
+
+<main class="sheet" id="sheet">
+  <div class="appendix">Appendix 57</div>
+  <h1>SUPPLY LEDGER CARD</h1>
+
+  <div class="meta">
+    <label><span>Entity Name:</span><input data-f="entity" autocomplete="off"></label>
+    <label><span>Fund Cluster:</span><input data-f="fund" autocomplete="off"></label>
+    <label><span>Item:</span><input data-f="item" autocomplete="off"></label>
+    <label><span>Stock No.:</span><input data-f="stockNo" autocomplete="off"></label>
+    <label><span>Description:</span><input data-f="desc" autocomplete="off"></label>
+    <label><span>Re-order Point:</span><input data-f="reorder" autocomplete="off" inputmode="numeric"></label>
+    <label><span>Unit of Measurement:</span><input data-f="unit" autocomplete="off"></label>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <colgroup>
+        <col style="width:11%"><col style="width:17%">
+        <col style="width:6%"><col style="width:8%"><col style="width:9%">
+        <col style="width:6%"><col style="width:8%"><col style="width:9%">
+        <col style="width:6%"><col style="width:8%"><col style="width:10%">
+        <col class="act" style="width:34px">
+      </colgroup>
+      <thead>
+        <tr>
+          <th rowspan="2">Date</th><th rowspan="2">Reference</th>
+          <th colspan="3">Receipt</th><th colspan="3">Issue</th><th colspan="3">Balance</th>
+          <th rowspan="2" class="act" style="border:0;background:transparent"></th>
+        </tr>
+        <tr>
+          <th>Qty.</th><th>Unit Cost</th><th>Total Cost</th>
+          <th>Qty.</th><th>Unit Cost</th><th>Total Cost</th>
+          <th>Qty.</th><th>Unit Cost</th><th>Total Cost</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <div class="msg" id="msg" role="alert"></div>
+  <p class="help">
+    Enter the date, reference (RRSP, RIS, etc.), receipt quantity and unit cost, and issue quantity.
+    Issue unit cost uses the moving average: the previous balance total cost divided by its quantity.
+    Everything saves automatically in this browser. Use Print for a paper copy.
+  </p>
+</main>
+
+<script>
+(function () {
+  var KEY = "slc-appendix-57-v1";
+  var FIELDS = ["entity","fund","item","stockNo","desc","reorder","unit"];
+  var state = load() || blank();
+  var tbody = document.getElementById("rows");
+  var msg = document.getElementById("msg");
+  var statusEl = document.getElementById("status");
+
+  function blank() {
+    var rows = []; for (var i = 0; i < 20; i++) rows.push(emptyRow());
+    return { head: {}, rows: rows };
+  }
+  function emptyRow() { return { date: "", ref: "", rq: "", ruc: "", iq: "" }; }
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return null; }
+  }
+  var saveTimer;
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); flash("Saved"); }
+    catch (e) { flash("Could not save in this browser"); }
+  }
+  function flash(t) {
+    statusEl.textContent = t; clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () { statusEl.textContent = ""; }, 1500);
+  }
+
+  var money = new Intl.NumberFormat("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  var qtyFmt = new Intl.NumberFormat("en-PH", { maximumFractionDigits: 4 });
+  function m(n) { return n === null ? "" : (n === 0 ? "-" : (n < 0 ? "(" + money.format(-n) + ")" : money.format(n))); }
+  function q(n) { return n === null ? "" : (n === 0 ? "-" : (n < 0 ? "(" + qtyFmt.format(-n) + ")" : qtyFmt.format(n))); }
+  function num(v) { var n = parseFloat(v); return isFinite(n) ? n : 0; }
+  function round2(n) { return Math.round((n + Number.EPSILON) * 100) / 100; }
+
+  // ---- compute all rows
+  function compute() {
+    var bq = 0, bt = 0, out = [], problems = [];
+    state.rows.forEach(function (r, i) {
+      var hasR = r.rq !== "" , hasI = r.iq !== "";
+      if (!hasR && !hasI) { out.push(null); return; }
+      var rq = num(r.rq), ruc = num(r.ruc), rt = round2(rq * ruc);
+      var iq = num(r.iq);
+      var iuc = hasI ? (bq !== 0 ? round2(bt / bq) : 0) : 0;
+      var it = hasI ? round2(iq * iuc) : 0;
+      // receipt is applied before the issue on the same line
+      bq = bq + rq - iq;
+      bt = round2(bt + rt - it);
+      var buc = bq !== 0 ? round2(bt / bq) : 0;
+      var over = bq < 0;
+      if (over) problems.push("Row " + (i + 1) + ": issue exceeds stock on hand.");
+      out.push({
+        rq: hasR ? rq : null, ruc: hasR ? ruc : null, rt: hasR ? rt : null,
+        iq: hasI ? iq : null, iuc: hasI ? iuc : null, it: hasI ? it : null,
+        bq: bq, buc: buc, bt: bt, over: over
+      });
+    });
+    return { rows: out, problems: problems };
+  }
+
+  // ---- render
+  function td(cls, html) { return '<td class="' + cls + '">' + html + "</td>"; }
+  function inp(i, f, type, cls, mode) {
+    var v = state.rows[i][f];
+    return '<td><input data-i="' + i + '" data-r="' + f + '" type="' + type + '"' +
+      (cls ? ' class="' + cls + '"' : "") +
+      (mode ? ' inputmode="' + mode + '"' : "") +
+      ' value="' + String(v).replace(/"/g, "&quot;") + '"></td>';
+  }
+  function render() {
+    var html = "";
+    state.rows.forEach(function (r, i) {
+      html += '<tr data-row="' + i + '">' +
+        inp(i, "date", "date", "txt") +
+        inp(i, "ref", "text", "txt") +
+        inp(i, "rq", "text", "", "decimal") +
+        inp(i, "ruc", "text", "", "decimal") +
+        td("calc", "") +
+        inp(i, "iq", "text", "", "decimal") +
+        td("calc", "") + td("calc", "") +
+        td("calc", "") + td("calc", "") + td("calc", "") +
+        '<td class="act"><button type="button" data-del="' + i + '" aria-label="Delete row ' + (i + 1) + '" title="Delete row">&times;</button></td>' +
+        "</tr>";
+    });
+    tbody.innerHTML = html;
+    refresh();
+  }
+  function refresh() {
+    var res = compute();
+    var trs = tbody.children;
+    res.rows.forEach(function (c, i) {
+      var cells = trs[i].querySelectorAll("td.calc");
+      // order: receipt total, issue uc, issue total, bal qty, bal uc, bal total
+      if (!c) { for (var k = 0; k < cells.length; k++) cells[k].textContent = ""; trs[i].classList.remove("over"); return; }
+      cells[0].textContent = m(c.rt);
+      cells[1].textContent = m(c.iuc);
+      cells[2].textContent = m(c.it);
+      cells[3].textContent = q(c.bq);
+      cells[4].textContent = m(c.buc);
+      cells[5].textContent = m(c.bt);
+      trs[i].classList.toggle("over", c.over);
+    });
+    msg.textContent = res.problems.join("  ");
+    return res;
+  }
+
+  // ---- events
+  tbody.addEventListener("input", function (e) {
+    var t = e.target; if (!t.dataset.r) return;
+    state.rows[+t.dataset.i][t.dataset.r] = t.value;
+    refresh(); save();
+  });
+  tbody.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-del]"); if (!b) return;
+    state.rows.splice(+b.dataset.del, 1);
+    if (!state.rows.length) state.rows.push(emptyRow());
+    render(); save();
+  });
+  document.querySelectorAll(".meta input").forEach(function (el) {
+    el.value = state.head[el.dataset.f] || "";
+    el.addEventListener("input", function () { state.head[el.dataset.f] = el.value; save(); });
+  });
+  function add(n) { for (var i = 0; i < n; i++) state.rows.push(emptyRow()); render(); save(); }
+  document.getElementById("addRow").onclick = function () { add(1); };
+  document.getElementById("addFive").onclick = function () { add(5); };
+  document.getElementById("print").onclick = function () { window.print(); };
+  document.getElementById("reset").onclick = function () {
+    if (!confirm("Clear the whole card? This cannot be undone.")) return;
+    state = blank();
+    document.querySelectorAll(".meta input").forEach(function (el) { el.value = ""; });
+    render(); save();
+  };
+  document.getElementById("csv").onclick = function () {
+    var res = compute(), h = state.head;
+    function esc(v) { v = String(v == null ? "" : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+    var lines = [
+      ["Supply Ledger Card (Appendix 57)"],
+      ["Entity Name", h.entity, "Fund Cluster", h.fund],
+      ["Item", h.item, "Stock No.", h.stockNo],
+      ["Description", h.desc, "Re-order Point", h.reorder],
+      ["Unit of Measurement", h.unit], [],
+      ["Date","Reference","Receipt Qty","Receipt Unit Cost","Receipt Total Cost",
+       "Issue Qty","Issue Unit Cost","Issue Total Cost","Balance Qty","Balance Unit Cost","Balance Total Cost"]
+    ];
+    state.rows.forEach(function (r, i) {
+      var c = res.rows[i]; if (!c) return;
+      lines.push([r.date, r.ref, c.rq, c.ruc, c.rt, c.iq, c.iuc, c.it, c.bq, c.buc, c.bt]);
+    });
+    var blob = new Blob(["\ufeff" + lines.map(function (l) { return l.map(esc).join(","); }).join("\r\n")],
+                        { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "supply-ledger-card" + (h.stockNo ? "-" + h.stockNo : "") + ".csv";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  };
+
+  render();
+})();
+</script>
+</body>
+</html>
