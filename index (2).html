@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Supplies Ledger Card</title>
+<style>
+:root{color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:#e9ecef;color:#000;font:15px/1.35 "Times New Roman",Times,serif;padding:16px}
+.sheet{max-width:1150px;margin:0 auto;background:#fff;padding:18px 22px 24px}
+.appx{text-align:right;font-style:italic;font-size:22px}
+h1{font:700 21px "Times New Roman",serif;text-align:center;margin:6px 0 22px}
+.ent{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-weight:700;margin-bottom:6px}
+.ent label{display:flex;gap:6px;align-items:baseline}
+input,select{font:inherit;color:#000;background:transparent;border:0;border-radius:0;padding:1px 3px;min-width:0}
+input:focus,select:focus{outline:2px solid #1a4fd6;outline-offset:0}
+.ent input{font-weight:700;border-bottom:1px dotted #777}
+table{border-collapse:collapse;width:100%}
+.hdr td{border:2px solid #000;padding:1px 4px}
+.hdr label{display:flex;gap:6px;align-items:baseline}
+.hdr input{flex:1;width:100%}
+.led{min-width:900px;table-layout:fixed}
+.led th,.led td{border:2px solid #000;padding:3px 5px;text-align:right;font-size:14px;font-variant-numeric:tabular-nums;height:34px}
+.led th{text-align:center;font-weight:700;height:auto}
+.led th.s{font-weight:400}
+.led th.g{font-style:italic}
+.led td.l{text-align:left}
+.led td.c{text-align:center}
+.led tr.bad td{background:#fde2e0}
+.led .act{border:0;width:30px;padding:0;text-align:center}
+.led td.act button{border:0;background:none;color:#b3261e;font-size:20px;cursor:pointer}
+.scroll{overflow-x:auto}
+.entry{margin-top:22px;background:#f1f4f8;border:1px solid #b8c4d0;padding:14px;font-family:"Segoe UI",system-ui,sans-serif;font-size:14px}
+.entry h2{font-size:15px;margin:0 0 10px}
+.erow{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px 14px;align-items:end}
+.entry label{display:block;font-size:12.5px;color:#444}
+.entry input,.entry select{width:100%;border-bottom:1.5px solid #8895a5;background:#fff;padding:5px 4px}
+button.b{font:inherit;cursor:pointer;border:1.5px solid #14213d;background:#14213d;color:#fff;padding:8px 14px}
+button.b.g{background:#fff;color:#14213d}
+#msg{min-height:20px;margin-top:8px;font-size:14px;color:#b3261e}
+.foot{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;font-family:"Segoe UI",system-ui,sans-serif}
+.foot .sp{flex:1}
+.note{font:12.5px "Segoe UI",system-ui,sans-serif;color:#555;margin-top:12px}
+@page{size:landscape;margin:10mm}
+@media print{body{background:#fff;padding:0}.sheet{padding:0;max-width:none}.entry,.foot,.note,#msg,.act{display:none}.ent input{border:0}.scroll{overflow:visible}}
+</style>
+</head>
+<body>
+<div class="sheet">
+<div class="appx">Appendix 57</div>
+<h1>SUPPLIES LEDGER CARD</h1>
+
+<div class="ent">
+<label>Entity Name :<input id="entity" size="42"></label>
+<label>Fund Cluster :<input id="fund" size="14"></label>
+</div>
+
+<table class="hdr">
+<tr><td style="width:62%"><label>Item :<input id="item"></label></td><td><label>Item Code :<input id="code"></label></td></tr>
+<tr><td><label>Description :<input id="desc"></label></td><td><label>Re-order Point :<input id="rop" type="number" min="0" step="any"></label></td></tr>
+<tr><td colspan="2"><label>Unit of Measurement :<input id="uom"></label></td></tr>
+</table>
+
+<div class="scroll"><table class="led">
+<colgroup><col style="width:8%"><col style="width:12%"><col style="width:6%"><col style="width:6%"><col style="width:8%"><col style="width:6%"><col style="width:6%"><col style="width:8%"><col style="width:6%"><col style="width:6%"><col style="width:8%"><col style="width:9%"><col style="width:30px"></colgroup>
+<thead>
+<tr><th rowspan="2">Date</th><th rowspan="2">Reference</th>
+<th colspan="3" class="g">Receipt</th><th colspan="3" class="g">Issue</th><th colspan="3" class="g">Balance</th>
+<th rowspan="2">No. of Days<br>to Consume</th><th rowspan="2" class="act" style="border:0"></th></tr>
+<tr><th class="s">Qty.</th><th class="s">Unit Cost</th><th class="s">Total Cost</th>
+<th class="s">Qty.</th><th class="s">Unit Cost</th><th class="s">Total Cost</th>
+<th class="s">Qty.</th><th class="s">Unit Cost</th><th class="s">Total Cost</th></tr>
+</thead>
+<tbody id="tb"></tbody>
+</table></div>
+
+<form class="entry" id="f" autocomplete="off">
+<h2>Add transaction</h2>
+<div class="erow">
+<label>Date<input id="d" type="date" required></label>
+<label>Reference<input id="r" placeholder="e.g., IAR 2026-11-004"></label>
+<label>Type<select id="t"><option value="B">Beginning balance</option><option value="R">Receipt</option><option value="I">Issue</option></select></label>
+<label>Quantity<input id="q" type="number" min="0" step="any" required></label>
+<label id="ucw">Unit cost (₱)<input id="u" type="number" min="0" step="any"></label>
+<label>No. of days to consume<input id="days" type="number" min="0" step="any"></label>
+<button class="b" type="submit">Add entry</button>
+</div>
+<div id="msg" role="alert"></div>
+</form>
+
+<div class="foot">
+<button class="b g" id="csv" type="button">Download CSV</button>
+<button class="b g" id="prt" type="button">Print</button>
+<span class="sp"></span>
+<button class="b g" id="clr" type="button">Clear all entries</button>
+</div>
+<p class="note">Balance unit cost = balance total cost ÷ balance quantity (moving average), recomputed after every receipt. The unit cost is rounded to two decimals and stays fixed on every issue until the next receipt changes it. Issue total cost = quantity × that unit cost.</p>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const KEY='slc-v1';
+let S={meta:{},rows:[]};
+try{const x=JSON.parse(localStorage.getItem(KEY));if(x)S=x}catch(e){}
+if(S.meta.entity===undefined)S.meta.entity='Zamboanga City Special Economic Zone Authority';
+if(S.meta.fund===undefined)S.meta.fund='Regular';
+['entity','fund','item','code','desc','uom','rop'].forEach(i=>{
+  $(i).value=S.meta[i]||'';
+  $(i).addEventListener('input',()=>{S.meta[i]=$(i).value;save();if(i==='rop')render()});
+});
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const fmt=n=>n.toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fq=n=>n.toLocaleString('en-PH',{maximumFractionDigits:4});
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const r2=n=>Math.round((n+Number.EPSILON)*100)/100;
+function compute(){
+  let q=0,c=0,fu=0;
+  return S.rows.map(r=>{
+    const o={...r,bad:false};
+    if(r.type==='I'){
+      if(r.qty>q+1e-9)o.bad=true;
+      o.iu=fu;o.ic=r2(r.qty*fu);q-=r.qty;c-=o.ic;
+      if(q<1e-9){q=0;c=0}
+    }else{
+      const t=r2(r.qty*r.cost);
+      if(r.type==='R')o.rc=t;
+      q+=r.qty;c+=t;
+      fu=q>0?r2(c/q):0;
+    }
+    o.bq=q;o.bc=c;o.bu=q>0?fu:0;
+    return o;
+  });
+}
+const BLANK='<td></td>'.repeat(12);
+function render(){
+  const rows=compute();
+  let h=rows.map((r,i)=>{
+    const R=r.type==='R',B=r.type==='B';
+    return `<tr class="${r.bad?'bad':''}"><td class="l">${esc(r.date)}</td><td class="l">${esc(B?'Beginning Balance':r.ref)}</td>`+
+    (B?`<td></td><td></td><td></td><td></td><td></td><td></td>`:R?`<td>${fq(r.qty)}</td><td>${fmt(r.cost)}</td><td>${fmt(r.rc)}</td><td></td><td></td><td></td>`
+      :`<td></td><td></td><td></td><td>${fq(r.qty)}</td><td>${fmt(r.iu)}</td><td>${fmt(r.ic)}</td>`)+
+    `<td>${fq(r.bq)}</td><td>${fmt(r.bu)}</td><td>${fmt(r.bc)}</td><td class="c">${r.days===''||r.days==null?'':fq(r.days)}</td>`+
+    `<td class="act"><button type="button" data-i="${i}" aria-label="Delete entry ${i+1}">×</button></td></tr>`;
+  }).join('');
+  const hasB=rows.some(r=>r.type==='B');
+  if(!hasB)h=`<tr><td></td><td class="l">Beginning Balance</td>${'<td></td>'.repeat(10)}<td class="act"></td></tr>`+h;
+  for(let i=rows.length+(hasB?0:1);i<14;i++)h+=`<tr>${BLANK}<td class="act"></td></tr>`;
+  $('tb').innerHTML=h;
+  const rop=parseFloat(S.meta.rop),last=rows[rows.length-1];
+  if(rows.some(r=>r.bad))$('msg').textContent='Highlighted row issues more than the balance on hand. Fix or delete it.';
+  else if(last&&!isNaN(rop)&&last.bq<=rop)$('msg').textContent='Stock is at or below the re-order point. Time to request replenishment.';
+  else $('msg').textContent='';
+}
+
+function typeUI(){
+  const t=$('t').value;
+  $('ucw').style.visibility=t==='I'?'hidden':'visible';
+  $('r').disabled=t==='B';
+  if(t==='B')$('r').value='Beginning Balance';else if($('r').value==='Beginning Balance')$('r').value='';
+}
+$('t').addEventListener('change',typeUI);
+$('f').addEventListener('submit',e=>{
+  e.preventDefault();
+  const type=$('t').value,qty=parseFloat($('q').value),cost=parseFloat($('u').value);
+  if(!(qty>0)){$('msg').textContent='Enter a quantity greater than zero.';return}
+  if(type!=='I'&&!(cost>=0)){$('msg').textContent='Enter the unit cost for this receipt.';return}
+  if(type==='B'&&S.rows.some(r=>r.type==='B')){$('msg').textContent='A beginning balance is already entered. Delete it first to replace it.';return}
+  const cur=compute(),bal=cur.length?cur[cur.length-1].bq:0;
+  if(type==='I'&&qty>bal+1e-9){$('msg').textContent='Cannot issue '+fq(qty)+'. Only '+fq(bal)+' on hand.';return}
+  const dv=parseFloat($('days').value);
+  S.rows.push({date:$('d').value,ref:type==='B'?'Beginning Balance':$('r').value.trim(),type,qty,cost:type==='I'?0:cost,days:isNaN(dv)?'':dv});
+  S.rows.sort((a,b)=>(a.type==='B'?-1:0)-(b.type==='B'?-1:0)||(a.date<b.date?-1:a.date>b.date?1:0));
+  save();render();
+  ['q','u','r','days'].forEach(i=>$(i).value='');
+  if($('t').value==='B')$('t').value='R';
+  typeUI();$('q').focus();
+});
+$('tb').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-i]');if(!b)return;
+  if(confirm('Delete this entry? Later balances will be recalculated.')){S.rows.splice(+b.dataset.i,1);save();render()}
+});
+$('clr').onclick=()=>{if(S.rows.length&&confirm('Delete all entries?')){S.rows=[];save();render()}};
+$('prt').onclick=()=>window.print();
+$('csv').onclick=()=>{
+  const h=['Date','Reference','Receipt Qty','Receipt Unit Cost','Receipt Total Cost','Issue Qty','Issue Unit Cost','Issue Total Cost','Balance Qty','Balance Unit Cost','Balance Total Cost','No. of Days to Consume'];
+  const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+  const lines=[h.join(',')].concat(compute().map(r=>{
+    const R=r.type==='R';
+    return [q(r.date),q(r.type==='B'?'Beginning Balance':r.ref),R?r.qty:'',R?r.cost.toFixed(2):'',R?r.rc.toFixed(2):'',R||r.type==='B'?'':r.qty,R||r.type==='B'?'':r.iu.toFixed(2),R||r.type==='B'?'':r.ic.toFixed(2),r.bq,r.bu.toFixed(2),r.bc.toFixed(2),r.days==null?'':r.days].join(',');
+  }));
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));
+  a.download=(S.meta.code||'supplies-ledger-card')+'.csv';a.click();
+};
+$('d').valueAsDate=new Date();
+if(!S.rows.length)$('t').value='B';
+typeUI();
+render();
+</script>
+</body>
+</html>
